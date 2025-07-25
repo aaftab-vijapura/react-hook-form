@@ -1,10 +1,17 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const App = () => {
   const [gender, setGender] = useState();
   const [sport, setSport] = useState([]);
   const [image, setImage] = useState(null);
+  const [select, setSelect] = useState([]);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handlepassvisible = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   const {
     register,
@@ -28,13 +35,28 @@ const App = () => {
   const handleImage = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file));
+      setImage(file);
     }
   };
 
+  // const handleselect = (e) => {
+  //   const selectedOptions  = Array.from(e.target.selectedOptions).map(
+  //     (option) => option.value
+  //   );
+  //   setSelect(selectedOptions );
+  // };
+
+  const handleselect = (e) => {
+    let { selectedOptions } = e.target;
+    const values = Array.from(selectedOptions).map((option) => option.value);
+    setSelect(values);
+  };
+
   const onSubmit = async (data) => {
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    console.log(data);
+    // await new Promise((resolve) => setTimeout(resolve, 5000));
+    let newdata = { ...data, image: data.image[0] };
+    console.log(newdata);
+    // console.log(data);
     alert("Submited Successfully");
   };
 
@@ -91,7 +113,7 @@ const App = () => {
                   message: "Please Enter Valid 10-digit Number",
                 },
                 maxLength: {
-                  value: 10,
+                  value: 11,
                   message: "Please Enter Valid 10-digit Number",
                 },
               })}
@@ -119,19 +141,28 @@ const App = () => {
           {/* Password */}
           <div className="form-group">
             <label>Password</label>
-            <input
-              type="password"
-              className={errors.Password ? "input-error" : ""}
-              {...register("Password", {
-                required: "Password Required",
-                pattern: {
-                  value:
-                    /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
-                  message:
-                    "Min 8 chars, 1 uppercase, 1 number & 1 special char",
-                },
-              })}
-            />
+            <div className="input-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                className={errors.Password ? "input-error" : ""}
+                {...register("Password", {
+                  required: "Password Required",
+                  pattern: {
+                    value:
+                      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                    message:
+                      "Min 8 chars, 1 uppercase, 1 number & 1 special char",
+                  },
+                })}
+              />
+              <button
+                type="button"
+                onClick={handlepassvisible}
+                className="eye-icon-btn"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
             {errors.Password && (
               <p className="error-msg">{errors.Password.message}</p>
             )}
@@ -206,6 +237,43 @@ const App = () => {
             )}
           </div>
 
+          {/* Single Value DropDown */}
+          <div className="form-group">
+            <label htmlFor="singleSelect">Select type:</label>
+            <select
+              id="singleSelect"
+              className={`dropdown ${errors.select ? "input-error" : ""}`}
+              {...register("select", { required: "Please Select" })}
+            >
+              <option value="">-- Select --</option>
+              <option value="single">Single</option>
+            </select>
+            {errors.select && (
+              <p className="error-msg">{errors.select.message}</p>
+            )}
+          </div>
+
+          {/* Multiple Value DropDown */}
+          <div className="form-group">
+            <label htmlFor="multiSelect">Select type:</label>
+            <select
+              id="multiSelect"
+              multiple
+              className="dropdown"
+              onChange={handleselect}
+              {...register("multiselect", {
+                required: "Please Select At Least One",
+              })}
+            >
+              <option value="First">First</option>
+              <option value="Second">Second</option>
+              <option value="Third">Third</option>
+            </select>
+            {errors.multiselect && (
+              <p className="error-msg">{errors.multiselect.message}</p>
+            )}
+          </div>
+
           {/* Image Upload */}
           <div className="form-group">
             <label>Upload Image</label>
@@ -221,7 +289,7 @@ const App = () => {
             {image && (
               <div style={{ marginTop: "15px", textAlign: "center" }}>
                 <img
-                  src={image}
+                  src={URL.createObjectURL(image)}
                   alt="Preview"
                   style={{
                     width: "100%",
