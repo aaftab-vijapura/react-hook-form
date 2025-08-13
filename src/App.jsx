@@ -39,12 +39,7 @@ const App = () => {
     }
   };
 
-  // const handleselect = (e) => {
-  //   const selectedOptions  = Array.from(e.target.selectedOptions).map(
-  //     (option) => option.value
-  //   );
-  //   setSelect(selectedOptions );
-  // };
+//hello world
 
   const handleselect = (e) => {
     let { selectedOptions } = e.target;
